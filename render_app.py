@@ -1,10 +1,12 @@
 from flask import Flask, request, session, redirect, url_for, render_template_string
+import os
 
 app = Flask(__name__)
 app.secret_key = "super-secret-password"
 
-USERNAME = "alicia"
-PASSWORD = "wanweitime"
+USERNAME = os.environ.get("LOGIN_USERNAME", "defaultuser")
+PASSWORD = os.environ.get("LOGIN_PASSWORD", "defaultpass")
+
 
 LOGIN_TEMPLATE = """
 <h2>Login</h2>
