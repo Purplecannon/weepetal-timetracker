@@ -1,0 +1,21 @@
+<h2>⏱️ Time Debt Tracker</h2>
+<form method="post">
+  <label><strong>Alicia's time entries:</strong></label><br>
+  <input name="alicia_time" placeholder="e.g. 1h30min 45s" style="width: 300px;"><br><br>
+
+  <label><strong>Wanwei's time entries:</strong></label><br>
+  <input name="wanwei_time" placeholder="e.g. 2h 3min45s" style="width: 300px;"><br><br>
+
+  <button type="submit">Calculate</button>
+</form>
+
+{% if result %}
+<hr>
+<h3>Result:</h3>
+<p><strong>Alicia:</strong> {{ alicia_total }}</p>
+<p><strong>Wanwei:</strong> {{ wanwei_total }}</p>
+<p style="font-size: 1.2em;"><strong>{{ result }}</strong></p>
+{% endif %}
+
+<br>
+<a href="/logout">Logout</a>

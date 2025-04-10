@@ -1,46 +1,25 @@
-from flask import Flask, request, session, redirect, url_for, render_template_string
+# app/routes.py
+from flask import Blueprint, render_template, request, session, redirect, url_for
 import os
-from time_debt_tracker import parse_time_string, format_seconds
+from .logic import parse_time_string, format_seconds
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "temporary-secret")
+main = Blueprint('main', __name__)
 
 USERNAME = os.environ.get("LOGIN_USERNAME", "defaultuser")
 PASSWORD = os.environ.get("LOGIN_PASSWORD", "defaultpass")
 
-
-LOGIN_TEMPLATE = """
-<h2>Login</h2>
-<form method="post">
-  <input name="username" placeholder="Username" required><br>
-  <input name="password" type="password" placeholder="Password" required><br>
-  <button type="submit">Login</button>
-</form>
-"""
-
-TRACKER_TEMPLATE = """
-<h2>Time Debt Tracker</h2>
-<p>This is your secret app!</p>
-<a href="/logout">Logout</a>
-"""
-
-
-@app.route("/", methods=["GET", "POST"])
+@main.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        if (
-            request.form["username"] == USERNAME
-            and request.form["password"] == PASSWORD
-        ):
+        if request.form["username"] == USERNAME and request.form["password"] == PASSWORD:
             session["logged_in"] = True
-            return redirect(url_for("tracker"))
-    return LOGIN_TEMPLATE
+            return redirect(url_for("main.tracker"))
+    return render_template("login.html")
 
-
-@app.route("/tracker", methods=["GET", "POST"])
+@main.route("/tracker", methods=["GET", "POST"])
 def tracker():
     if not session.get("logged_in"):
-        return redirect(url_for("login"))
+        return redirect(url_for("main.login"))
 
     alicia_total = wanwei_total = result = None
 
@@ -65,19 +44,14 @@ def tracker():
         except Exception as e:
             result = f"⚠️ Error: {str(e)}"
 
-    return render_template_string(
-        TRACKER_TEMPLATE,
-        result=result,
-        alicia_total=alicia_total,
-        wanwei_total=wanwei_total,
-    )
+    return render_template("tracker.html",
+                           result=result,
+                           alicia_total=alicia_total,
+                           wanwei_total=wanwei_total)
 
-
-@app.route("/logout")
+@main.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("main.login"))
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
