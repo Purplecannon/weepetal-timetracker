@@ -8,9 +8,21 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "temporary-secret")
 USERNAME = os.environ.get("LOGIN_USERNAME", "defaultuser")
 PASSWORD = os.environ.get("LOGIN_PASSWORD", "defaultpass")
 
-LOGIN_TEMPLATE = """ ... (same as before) ... """
 
-TRACKER_TEMPLATE = """ ... (same as before) ... """
+LOGIN_TEMPLATE = """
+<h2>Login</h2>
+<form method="post">
+  <input name="username" placeholder="Username" required><br>
+  <input name="password" type="password" placeholder="Password" required><br>
+  <button type="submit">Login</button>
+</form>
+"""
+
+TRACKER_TEMPLATE = """
+<h2>Time Debt Tracker</h2>
+<p>This is your secret app!</p>
+<a href="/logout">Logout</a>
+"""
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -22,7 +34,7 @@ def login():
         ):
             session["logged_in"] = True
             return redirect(url_for("tracker"))
-    return render_template_string(LOGIN_TEMPLATE)
+    return LOGIN_TEMPLATE
 
 
 @app.route("/tracker", methods=["GET", "POST"])
@@ -68,5 +80,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=10000)
