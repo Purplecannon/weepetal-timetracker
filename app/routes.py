@@ -14,12 +14,18 @@ PASSWORD = os.environ.get("LOGIN_PASSWORD", "defaultpass")
 @main.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        if (
-            request.form["username"] == USERNAME
-            and request.form["password"] == PASSWORD
-        ):
+        submitted_user = request.form["username"]
+        submitted_pass = request.form["password"]
+
+        print(f"🔐 Attempting login: {submitted_user} / {submitted_pass}")
+
+        if submitted_user == USERNAME and submitted_pass == PASSWORD:
             session["logged_in"] = True
+            print("✅ Login successful!")
             return redirect(url_for("main.tracker"))
+        else:
+            print("❌ Login failed.")
+
     return render_template("login.html")
 
 
