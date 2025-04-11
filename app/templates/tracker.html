@@ -1,21 +1,173 @@
-<h2>⏱️ Time Debt Tracker</h2>
-<form method="post">
-  <label><strong>Alicia's time entries:</strong></label><br>
-  <input name="alicia_time" placeholder="e.g. 1h30min 45s" style="width: 300px;"><br><br>
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        margin: 2em;
+        background-color: #fdfaf6;
+        color: #333;
+        position: relative;
+      }
 
-  <label><strong>Wanwei's time entries:</strong></label><br>
-  <input name="wanwei_time" placeholder="e.g. 2h 3min45s" style="width: 300px;"><br><br>
+      .balance-box {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background-color: #fff4ea;
+        padding: 12px 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 260px;
+        text-align: right;
+        z-index: 1000;
+        animation: fadeIn 1s ease-in-out;
+      }
 
-  <button type="submit">Calculate</button>
-</form>
+      .balance-box h3 {
+        margin: 0 0 8px 0;
+      }
 
-{% if result %}
-<hr>
-<h3>Result:</h3>
-<p><strong>Alicia:</strong> {{ alicia_total }}</p>
-<p><strong>Wanwei:</strong> {{ wanwei_total }}</p>
-<p style="font-size: 1.2em;"><strong>{{ result }}</strong></p>
-{% endif %}
+      .balance-box p {
+        margin: 0;
+      }
 
-<br>
-<a href="/logout">Logout</a>
+      form {
+        margin-top: 100px;
+        max-width: 600px;
+      }
+
+      input {
+        margin-top: 6px;
+        margin-bottom: 10px;
+        padding: 6px;
+        font-size: 1em;
+      }
+
+      button {
+        background-color: #ffccd5;
+        color: #222;
+        border: none;
+        padding: 8px 12px;
+        font-size: 1em;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 5px;
+      }
+
+      button:hover {
+        background-color: #ffb3c2;
+      }
+
+      hr {
+        margin-top: 2em;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .pip-icon {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 120px;
+        height: auto;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="balance-box">
+      <h3>💼 Time Balance</h3>
+      <p><strong>{{ balance_text }}</strong></p>
+      {% if last_updated %}
+      <p><em>{{ last_updated }}</em></p>
+      {% endif %}
+    </div>
+
+    <h2>⏱️ Time Debt Tracker</h2>
+    <form method="post">
+      <div>
+        <label><strong>Alicia's time entries:</strong></label
+        ><br />
+        <div id="alicia-entries">
+          <input
+            name="alicia_time"
+            placeholder="e.g. 1h30min"
+            style="width: 300px"
+          /><br />
+        </div>
+        <button
+          type="button"
+          onclick="addField('alicia-entries', 'alicia_time')"
+        >
+          + Add Entry
+        </button>
+      </div>
+      <br />
+
+      <div>
+        <label><strong>Wanwei's time entries:</strong></label
+        ><br />
+        <div id="wanwei-entries">
+          <input
+            name="wanwei_time"
+            placeholder="e.g. 2h 45min"
+            style="width: 300px"
+          /><br />
+        </div>
+        <button
+          type="button"
+          onclick="addField('wanwei-entries', 'wanwei_time')"
+        >
+          + Add Entry
+        </button>
+      </div>
+      <br />
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    {% if result %}
+    <hr />
+    <h3>Result:</h3>
+    <p><strong>Alicia:</strong> {{ alicia_total }}</p>
+    <p><strong>Wanwei:</strong> {{ wanwei_total }}</p>
+    <p style="font-size: 1.2em"><strong>{{ result }}</strong></p>
+    {% endif %}
+
+    <br />
+    <a href="/logout">Logout</a>
+
+    <script>
+      function addField(containerId, fieldName) {
+        const container = document.getElementById(containerId);
+        const input = document.createElement("input");
+        input.name = fieldName;
+        input.placeholder = "e.g. 1h30min";
+        input.style =
+          "width: 300px; margin-top: 6px; padding: 6px; font-size: 1em;";
+        container.appendChild(input);
+        container.appendChild(document.createElement("br"));
+      }
+    </script>
+  </body>
+</html>
