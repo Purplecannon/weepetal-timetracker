@@ -1,11 +1,12 @@
 # app/logic.py
 import os
-from datetime import datetime
 import json
 import re
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BALANCE_FILE = os.path.join(BASE_DIR, "..", "data", "balance.json")
+HISTORY_FILE = os.path.join(BASE_DIR, "..", "data", "history.json")
 
 
 def parse_time_string(time_str):
@@ -52,5 +53,37 @@ def save_balance(balance_seconds):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(BALANCE_FILE, "w") as f:
         json.dump({"balance_seconds": balance_seconds, "last_updated": now}, f)
-    print(f"💾 Saved balance: {balance_seconds} seconds at {now}")
     return now
+
+
+def log_history(alicia_time, wanwei_time, balance):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    entry = {
+        "timestamp": timestamp,
+        "alicia": format_seconds(alicia_time),
+        "wanwei": format_seconds(wanwei_time),
+        "balance": format_seconds(balance),
+    }
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            history = json.load(f)
+    except FileNotFoundError:
+        history = []
+    history.insert(0, entry)  # newest first
+    with open(HISTORY_FILE, "w") as f:
+        json.dump(history, f, indent=2)
+
+
+def load_history():
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+def reset_history():
+    with open(HISTORY_FILE, "w") as f:
+        json.dump([], f)
+    with open(BALANCE_FILE, "w") as f:
+        json.dump({"balance_seconds": 0, "last_updated": None}, f)

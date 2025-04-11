@@ -1,8 +1,17 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, session, redirect, url_for
 import os
-from .logic import parse_time_string, format_seconds, load_balance, save_balance
 import logging
+from .logic import (
+    parse_time_string,
+    format_seconds,
+    load_balance,
+    save_balance,
+    log_history,
+    load_history,
+    reset_history,
+)
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -60,8 +69,12 @@ def tracker():
             current_balance = new_balance
             last_updated = timestamp
 
+            log_history(alicia_seconds, wanwei_seconds, new_balance)
+
         except Exception as e:
             result = f"⚠️ Error: {str(e)}"
+
+    history = load_history()
 
     # Always calculate balance display and render template, even for GET
     balance_text = (
@@ -72,6 +85,9 @@ def tracker():
         else "⚖️ No one owes time!"
     )
 
+    alicia_sum = sum(parse_time_string(entry["alicia"]) for entry in history)
+    wanwei_sum = sum(parse_time_string(entry["wanwei"]) for entry in history)
+
     return render_template(
         "tracker.html",
         result=result,
@@ -80,7 +96,19 @@ def tracker():
         balance_text=balance_text,
         last_updated=last_updated,
         current_balance=current_balance,
+        history=history,
+        alicia_sum=format_seconds(alicia_sum),
+        wanwei_sum=format_seconds(wanwei_sum),
     )
+
+
+@main.route("/reset", methods=["POST"])
+def reset():
+    if not session.get("logged_in"):
+        return redirect(url_for("main.login"))
+
+    reset_history()
+    return redirect(url_for("main.tracker"))
 
 
 @main.route("/logout")
