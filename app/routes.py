@@ -1,9 +1,10 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, session, redirect, url_for
 import os
-from .logic import parse_time_string, format_seconds
-from .logic import load_balance, save_balance
+from .logic import parse_time_string, format_seconds, load_balance, save_balance
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 main = Blueprint("main", __name__)
 
@@ -13,20 +14,19 @@ PASSWORD = os.environ.get("LOGIN_PASSWORD", "defaultpass")
 
 @main.route("/", methods=["GET", "POST"])
 def login():
+    message = None
+
     if request.method == "POST":
         submitted_user = request.form["username"]
         submitted_pass = request.form["password"]
 
-        print(f"🔐 Attempting login: {submitted_user} / {submitted_pass}")
-
         if submitted_user == USERNAME and submitted_pass == PASSWORD:
             session["logged_in"] = True
-            print("✅ Login successful!")
             return redirect(url_for("main.tracker"))
         else:
-            print("❌ Login failed.")
+            message = "❌ Incorrect username or password."
 
-    return render_template("login.html")
+    return render_template("login.html", message=message)
 
 
 @main.route("/tracker", methods=["GET", "POST"])
